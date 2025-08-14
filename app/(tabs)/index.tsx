@@ -147,6 +147,9 @@ export default function Index() {
     }
   };
 
+  const isHabitCompleted = (habitId: string) =>
+    completedHabits?.includes(habitId);
+
   const renderRightActions = () => (
     <View style={styles.swipeActionRight}>
       <MaterialCommunityIcons
@@ -157,13 +160,17 @@ export default function Index() {
     </View>
   );
 
-  const renderLeftActions = () => (
+  const renderLeftActions = (habitId: string) => (
     <View style={styles.swipeActionLeft}>
-      <MaterialCommunityIcons
-        name='check-circle-outline'
-        size={32}
-        color={'#fff'}
-      />
+      {isHabitCompleted(habitId) ? (
+        <Text style={{ color: '#fff' }}>Completed!</Text>
+      ) : (
+        <MaterialCommunityIcons
+          name='check-circle-outline'
+          size={32}
+          color={'#fff'}
+        />
+      )}
     </View>
   );
 
@@ -194,7 +201,7 @@ export default function Index() {
               }}
               overshootLeft={false}
               overshootRight={false}
-              renderLeftActions={renderLeftActions}
+              renderLeftActions={() => renderLeftActions(habit.$id)}
               renderRightActions={renderRightActions}
               onSwipeableOpen={(direction) => {
                 if (direction === 'right') {
@@ -206,7 +213,13 @@ export default function Index() {
                 swipeableRefs.current[habit.$id]?.close();
               }}
             >
-              <Surface style={styles.card} elevation={1}>
+              <Surface
+                style={[
+                  styles.card,
+                  isHabitCompleted(habit.$id) && styles.cardCompleted,
+                ]}
+                elevation={1}
+              >
                 <View style={styles.cardContent}>
                   <Text style={styles.cardTitle}>{habit.title}</Text>
                   <Text style={styles.cardDescription}>
@@ -267,6 +280,10 @@ const styles = StyleSheet.create({
     shadowOpacity: 0.08,
     shadowRadius: 8,
     elevation: 4,
+  },
+
+  cardCompleted: {
+    opacity: 0.6,
   },
 
   cardContent: {
